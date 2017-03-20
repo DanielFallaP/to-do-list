@@ -1,1 +1,59 @@
-hello!
+<nav> 
+    <div class="nav-wrapper" style="background-color:black;">
+      <div class="brand-logo">&nbsp;My To-Do List</div>
+	  <ul class="right hide-on-med-and-down" style="cursor: pointer;  margin-right: 12px" (click)="signOut()">
+        <li><i class="material-icons">power_settings_new</i></li>		
+      </ul>
+    </div>
+</nav>
+<div class="container" style="margin-top: 35px;">
+	<div class="row">
+		<div class="col s6" (dragover) = "onDragOver($event)"
+			(drop) = "onDropIncomplete($event)">
+			<div id="incompleteList">
+				<div *ngFor = "let toDo of incomplete" class="card yellow darken-1 hoverable" 
+					[style.display]="getDisplay(toDo)" draggable="true" (dragstart)="onDrag(toDo)">
+					
+					<div class="card-content white-text" id="{{toDo._id}}">
+						<span class="card-title editable title">{{toDo.title}}</span>
+						<br>					
+						<div class="editable description">{{toDo.description}}</div>
+						<br>					
+						<div>{{toDo.author}}</div>
+					</div>
+					<div class="card-action">
+						<i class="material-icons" (click)="saveToDo(toDo)"
+							style="cursor:pointer" >save</i>
+						<i class="material-icons" (click)="deleteToDo(toDo)"
+							style="cursor:pointer" >clear</i>
+					</div>
+				</div>
+			</div>
+			
+			<a class="btn-floating btn-large" (click)="addToDo()">
+				<i class="material-icons">add</i>
+			</a>
+		</div>
+
+		<div class="col s6" (dragover) = "onDragOver($event)"
+			(drop) = "onDropComplete($event)">
+			<div *ngFor = "let toDo of complete" class="card green darken-1 hoverable"
+				draggable="true" (dragstart)="onDrag(toDo)">
+				
+				<div class="card-content white-text" id="{{toDo._id}}">
+					<span class="card-title editable title">{{toDo.title}}</span>
+					<br>					
+					<div class="editable description">{{toDo.description}}</div>
+					<br>					
+					<div class="editable">{{toDo.author}}</div>
+				</div>
+				<div class="card-action">
+					<i class="material-icons" (click)="saveToDo(toDo)"
+						style="cursor:pointer" >save</i>
+					<i class="material-icons" (click)="deleteToDo(toDo)"
+						style="cursor:pointer" >clear</i>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>

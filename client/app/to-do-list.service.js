@@ -21,11 +21,12 @@ var ToDoListService = (function () {
         this.router = router;
     }
     /**
-     * Gets the videos by paging if present.
+     * Gets the videos by paging if appropriate parameters are present.
      */
     ToDoListService.prototype.getToDoList = function (skip, limit) {
         var params = new http_1.URLSearchParams();
         params.set('sessionId', this.sessionId);
+        var paramsReq = {};
         if (skip != null && limit != null) {
             params.set('skip', skip.toString());
             params.set('limit', limit.toString());
@@ -49,7 +50,36 @@ var ToDoListService = (function () {
             .catch(this.handleError);
     };
     /**
-     * Signs out the app.
+     * Creates/updates todo in DB.
+     */
+    ToDoListService.prototype.saveToDo = function (toDo) {
+        var params = new http_1.URLSearchParams();
+        params.set('sessionId', this.sessionId);
+        var headers = new http_1.Headers({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+        var options = new http_1.RequestOptions({ headers: headers, search: params });
+        return this.http.put('todo', toDo, options)
+            .toPromise()
+            .then(function (res) { return res.json().data; })
+            .catch(this.handleError);
+    };
+    ToDoListService.prototype.deleteToDo = function (toDo) {
+        var params = new http_1.URLSearchParams();
+        params.set('sessionId', this.sessionId);
+        var headers = new http_1.Headers({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+        var options = new http_1.RequestOptions({ headers: headers, search: params, body: toDo });
+        return this.http.delete('todo', options)
+            .toPromise()
+            .then(function (res) { return res.json().data; })
+            .catch(this.handleError);
+    };
+    /**
+     * Signs out of the app.
      */
     ToDoListService.prototype.signOut = function () {
         var params = new http_1.URLSearchParams();

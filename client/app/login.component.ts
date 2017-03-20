@@ -8,7 +8,7 @@ import { ToDo } from './to-do';
 import { Headers, Http, RequestOptions, Response } from '@angular/http';
 import { Router } from '@angular/router';
 
-import 'app/modals.js'
+import 'app/commons.js'
  
 @Component({
   moduleId: module.id,

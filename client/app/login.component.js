@@ -13,7 +13,7 @@ var to_do_list_service_1 = require('./to-do-list.service');
 var user_1 = require('./user');
 var http_1 = require('@angular/http');
 var router_1 = require('@angular/router');
-require('app/modals.js');
+require('app/commons.js');
 var LoginComponent = (function () {
     function LoginComponent(toDoListService, http, router, ref) {
         this.toDoListService = toDoListService;

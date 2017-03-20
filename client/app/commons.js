@@ -31,3 +31,9 @@ function setAnimation(el){
 function setCollapseButton(el){
 	$(".button-collapse").sideNav();
 }
+
+function setInlineEditor(){
+	setTimeout(function () {
+		new MediumEditor('.editable')
+	}, 0);
+}

@@ -2,32 +2,28 @@
  * Object representation of a todo.
  */
 export class ToDo{
-   constructor() 
-	{ 
+	constructor() { 
 	}
 
-  // Unique identifier
-  _id: string;
+	// Unique identifier
+	_id: string;
+	
+	// Alternative id name
+	id?: string;
   
-  // Todo's name
-  name: string;
+	// Todo's title
+	title: string;
   
-  // Todo's description
-  description: string;
+	// Todo's description
+	description: string;
   
-  // Todo's Url
-  url?: string;
+	// Todo's author
+	author: string;
   
-  // Array of historic ratings
-  ratings?: number[];
-  
-  // Video's average rating
-  rating?: number;
-  
-  // Used to color the rating star element appropriately
-  one?: string;
-  two?: string;
-  three?: string;
-  four?: string;
-  five?: string;
+	// Todo's status
+	status: string;
+ 
+	// Flag indicating whether this is the last item.
+	// Used to append a new todo.
+	lastItem?: boolean;
 }
