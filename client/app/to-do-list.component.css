@@ -1,1 +1,30 @@
-#css file
+div.specialInlineFocus:focus{
+    outline: white auto 5px;
+}
+
+span.specialInlineFocus:focus{
+    outline: white auto 5px;
+}
+
+.deleteTodo:before {
+  content: '✕';
+}
+.deleteTodo {
+  color: white;
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  cursor: pointer;
+}
+
+div.rightDivider{
+	border-width: 0px 1px 0px 0px;
+    border-color: #bdbdbd;
+    border-style: dashed;
+}
+
+div.leftDivider{
+	border-width: 0px 0px 0px 1px;
+    border-color: #bdbdbd;
+    border-style: dashed;
+}

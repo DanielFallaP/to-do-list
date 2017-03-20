@@ -25,5 +25,5 @@ export class ToDo{
  
 	// Flag indicating whether this is the last item.
 	// Used to append a new todo.
-	lastItem?: boolean;
+	lastItem: boolean = false;
 }

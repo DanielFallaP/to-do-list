@@ -1,4 +1,5 @@
 declare function showToast(message: string, delay: number): void;
+declare function setFadeInAnimation(el: string):void;
 
 import { OnInit } from '@angular/core';
 import { Component, ApplicationRef } from '@angular/core';
@@ -37,6 +38,7 @@ export class LoginComponent implements OnInit{
 	this.user = new User();
 	this.user.username = 'ali';
 	this.user.password = '5f4dcc3b5aa765d61d8327deb882cf99'
+	setFadeInAnimation('#loginForm');
   };
   
   /**

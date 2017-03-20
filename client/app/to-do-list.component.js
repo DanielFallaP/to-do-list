@@ -35,15 +35,12 @@ var ToDoListComponent = (function () {
                 return toDo.status === COMPLETE;
             });
             setInlineEditor();
+            setListAnimation('#incompleteList', true);
+            setListAnimation('#completeList', false);
+            setFadeInAnimation('#addButton');
             showToast('To-dos loaded!!', 4000);
+            //readjustPanels();
         });
-    };
-    /**
-     * Returns display attribute value according to todo
-     * position in the list.
-     */
-    ToDoListComponent.prototype.getDisplay = function (toDo) {
-        return toDo.lastItem ? 'none' : 'block';
     };
     /**
      * Creates new todo, and adds it to the incomplete list.
@@ -54,12 +51,13 @@ var ToDoListComponent = (function () {
         this.blankToDo.title = 'Enter Title';
         this.blankToDo.status = INCOMPLETE;
         this.blankToDo.description = 'Enter Description';
-        //this.blankToDo.lastItem = true;
         this.toDoListService.saveToDo(this.blankToDo)
             .then(function (toDo) {
             _this.incomplete.push(toDo);
+            setFadeInAnimation('#' + toDo._id + 'Card');
             showToast('To-Do added!!', 4000);
             setInlineEditor();
+            //readjustPanels();
         });
     };
     ToDoListComponent.prototype.saveToDo = function (toDo) {
@@ -67,6 +65,7 @@ var ToDoListComponent = (function () {
             .then(function (saved) {
             toDo.author = saved.author;
             showToast('To-Do saved!!', 4000);
+            //readjustPanels();
         });
     };
     ToDoListComponent.prototype.savePromise = function (toDo) {
@@ -86,14 +85,19 @@ var ToDoListComponent = (function () {
         this.toDoListService.deleteToDo(toDelete)
             .then(function () {
             showToast('To-Do deleted (forever!!)', 4000);
-            if (toDo.status === INCOMPLETE)
-                _this.incomplete = _this.incomplete.filter(function (td) {
-                    return td._id !== toDo._id;
-                });
-            else
-                _this.complete = _this.complete.filter(function (td) {
-                    return td._id !== toDo._id;
-                });
+            var element = document.getElementById(toDo._id + 'Card');
+            element.className += " scale-out";
+            setTimeout(function () {
+                if (toDo.status === INCOMPLETE)
+                    _this.incomplete = _this.incomplete.filter(function (td) {
+                        return td._id !== toDo._id;
+                    });
+                else
+                    _this.complete = _this.complete.filter(function (td) {
+                        return td._id !== toDo._id;
+                    });
+                //readjustPanels();
+            }, 200);
         });
     };
     ToDoListComponent.prototype.onDragOver = function (event) {
@@ -105,6 +109,7 @@ var ToDoListComponent = (function () {
     ToDoListComponent.prototype.onDropComplete = function (event) {
         var _this = this;
         event.preventDefault();
+        var self = this;
         this.draggingToDo.status = COMPLETE;
         this.savePromise(this.draggingToDo)
             .then(function (saved) {
@@ -113,6 +118,7 @@ var ToDoListComponent = (function () {
                 return td._id !== _this.draggingToDo._id;
             });
             _this.complete.push(_this.draggingToDo);
+            //readjustPanels();
         });
     };
     ToDoListComponent.prototype.onDropIncomplete = function (event) {
@@ -126,6 +132,7 @@ var ToDoListComponent = (function () {
                 return td._id !== _this.draggingToDo._id;
             });
             _this.incomplete.push(_this.draggingToDo);
+            //readjustPanels();
         });
     };
     /**

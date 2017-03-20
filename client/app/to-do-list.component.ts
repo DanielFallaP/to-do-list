@@ -1,7 +1,10 @@
 declare function showModal():void;
 declare function showToast(message:string, delay:number):void;
 declare function setInlineEditor():void;
-declare var self: any;
+declare function setListAnimation(el: string, left: boolean):void;
+declare function setFadeInAnimation(el: string):void;
+declare function readjustPanels(): void;
+
 declare var Math: any;
 declare var document: any;
 
@@ -43,8 +46,7 @@ export class ToDoListComponent implements OnInit{
 	
 	// Todo being dragged
 	private draggingToDo: ToDo;
-	
-	
+
 	/**
 	 * Loads todos, splits thems in two according to 
 	 * status.
@@ -62,16 +64,13 @@ export class ToDoListComponent implements OnInit{
 				});		
 				
 				setInlineEditor();
+				setListAnimation('#incompleteList', true);
+				setListAnimation('#completeList', false);
+				setFadeInAnimation('#addButton');
+				
 				showToast('To-dos loaded!!', 4000);
+				//readjustPanels();
 			});
-	}
-	
-	/**
-	 * Returns display attribute value according to todo 
-	 * position in the list.
-	 */
-	getDisplay(toDo: ToDo): string{
-		return toDo.lastItem? 'none' : 'block';
 	}
 	
 	/**
@@ -83,13 +82,16 @@ export class ToDoListComponent implements OnInit{
 		this.blankToDo.title = 'Enter Title';
 		this.blankToDo.status = INCOMPLETE;
 		this.blankToDo.description = 'Enter Description';
-		//this.blankToDo.lastItem = true;
 				
 		this.toDoListService.saveToDo(this.blankToDo)
 			.then((toDo: ToDo) => {
 				this.incomplete.push(toDo);
+				
+				setFadeInAnimation('#' + toDo._id + 'Card')
+				
 				showToast('To-Do added!!', 4000);
 				setInlineEditor();
+				//readjustPanels();
 			});
 	}
 	
@@ -98,6 +100,8 @@ export class ToDoListComponent implements OnInit{
 			.then((saved: ToDo) => {
 				toDo.author = saved.author;
 				showToast('To-Do saved!!', 4000);
+				//readjustPanels();
+
 			})
 	}
 	
@@ -120,14 +124,19 @@ export class ToDoListComponent implements OnInit{
 		this.toDoListService.deleteToDo(toDelete)
 			.then(() => {
 				showToast('To-Do deleted (forever!!)', 4000);
-				if (toDo.status === INCOMPLETE)
-					this.incomplete = this.incomplete.filter((td) => {
-						return td._id !== toDo._id;
-					});
-				else
-					this.complete = this.complete.filter((td) => {
-						return td._id !== toDo._id;
-					})
+				var element = document.getElementById(toDo._id + 'Card');
+				element.className += " scale-out";
+				setTimeout(() => {
+					if (toDo.status === INCOMPLETE)
+						this.incomplete = this.incomplete.filter((td) => {
+							return td._id !== toDo._id;
+						});
+					else
+						this.complete = this.complete.filter((td) => {
+							return td._id !== toDo._id;
+						})
+					//readjustPanels();
+				}, 200);
 			});
 	}
 	
@@ -142,6 +151,7 @@ export class ToDoListComponent implements OnInit{
 	onDropComplete(event: any): void{
 		event.preventDefault();
 		
+		var self = this;
 		this.draggingToDo.status = COMPLETE;
 		this.savePromise(this.draggingToDo)
 			.then((saved: ToDo) => {
@@ -152,9 +162,10 @@ export class ToDoListComponent implements OnInit{
 					});
 					
 				this.complete.push(this.draggingToDo);
+				//readjustPanels();
 			});
 	}
-	
+
 	onDropIncomplete(event: any): void{
 		event.preventDefault();
 		
@@ -168,6 +179,7 @@ export class ToDoListComponent implements OnInit{
 					});
 					
 				this.incomplete.push(this.draggingToDo);
+				//readjustPanels();
 			});
 	}
 	

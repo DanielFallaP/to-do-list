@@ -28,6 +28,7 @@ var LoginComponent = (function () {
         this.user = new user_1.User();
         this.user.username = 'ali';
         this.user.password = '5f4dcc3b5aa765d61d8327deb882cf99';
+        setFadeInAnimation('#loginForm');
     };
     ;
     /**
