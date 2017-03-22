@@ -10,7 +10,7 @@ import { ToDoListService } from './to-do-list.service';
 })
 
 /**
- * Component class for the video portal app.
+ * Component class for the app.
  */
 export class AppComponent  {
 	constructor (private toDoListService: ToDoListService){}

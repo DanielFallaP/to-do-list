@@ -4,9 +4,10 @@
  */
 var ToDo = (function () {
     function ToDo() {
-        // Flag indicating whether this is the last item.
-        // Used to append a new todo.
-        this.lastItem = false;
+        // Indicates whether this is deletable 	
+        this.deletable = false;
+        // Indicates whether this is editable
+        this.editable = false;
     }
     return ToDo;
 }());

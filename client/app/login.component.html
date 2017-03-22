@@ -4,18 +4,22 @@
 		<div class="col s12">      
 		  <div class="row">
 			<div class="input-field col s12">
-			  <input value="ali" [(ngModel)]="user.username" id="username" type="text">
+			  <input [(ngModel)]="user.username" id="username" type="text">
 			  <label class="active" for="username">User Name</label>
 			</div>
 		  </div>
 		  <div class="row">
 			<div class="input-field col s12">
-			  <input value="5f4dcc3b5aa765d61d8327deb882cf99" [(ngModel)]="user.password" id="password" type="password" class="validate">
+			  <input [(ngModel)]="user.password" id="password" type="password" class="validate">
 			  <label class="active" for="password">Password</label>
 			</div>
 		  </div>
 		  <div class="row">
-			<a class="waves-light btn light-blue lighten-1" (click)="signIn(user)">Sign In</a>
+			<div style="text-align: right;"> 
+				<a class="waves-light btn light-blue lighten-1" (click)="signIn(user)">
+					Sign In
+				</a>
+			</div>
 		  </div>
 		</div>
 	</div>

@@ -4,7 +4,7 @@ declare function setInlineEditor():void;
 declare function setListAnimation(el: string, left: boolean):void;
 declare function setFadeInAnimation(el: string):void;
 declare function readjustPanels(): void;
-
+declare function getTarget(x: number): string;
 declare var Math: any;
 declare var document: any;
 
@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 
 import 'app/commons.js';
 
+// Constants represents the only 2 todo states
 const INCOMPLETE = 'notCompleted';
 const COMPLETE = 'completed';
 
@@ -55,6 +56,18 @@ export class ToDoListComponent implements OnInit{
 		
 		this.toDoListService.getToDoList(null, null)
 			.then((toDoList: ToDo[]) => {
+				for (var i in toDoList){
+					if (toDoList[i].author.username 
+						=== this.toDoListService.loggedInUser.username){
+						toDoList[i].deletable = true;
+						toDoList[i].editable = true;
+					}
+					else{
+						toDoList[i].deletable = false;
+						toDoList[i].editable = false;
+					}
+				}
+			
 				this.incomplete = toDoList.filter(function (toDo){
 					return toDo.status === INCOMPLETE;
 				});
@@ -68,8 +81,8 @@ export class ToDoListComponent implements OnInit{
 				setListAnimation('#completeList', false);
 				setFadeInAnimation('#addButton');
 				
-				showToast('To-dos loaded!!', 4000);
-				//readjustPanels();
+				showToast('Welcome back, ' + this.toDoListService.loggedInUser.username + '!!' , 4000);
+				readjustPanels();
 			});
 	}
 	
@@ -85,26 +98,44 @@ export class ToDoListComponent implements OnInit{
 				
 		this.toDoListService.saveToDo(this.blankToDo)
 			.then((toDo: ToDo) => {
+				toDo.editable = true;
+				toDo.deletable = true;
 				this.incomplete.push(toDo);
 				
 				setFadeInAnimation('#' + toDo._id + 'Card')
 				
 				showToast('To-Do added!!', 4000);
 				setInlineEditor();
-				//readjustPanels();
+				readjustPanels();
+				setTimeout(() => {
+					window.scrollTo(0, document.body.scrollHeight);
+				}, 0);
 			});
 	}
 	
+	/**
+	 * Gets the cursor for the todo according to the value
+	 * of field 'editable'
+	 */
+	getCursor(toDo: ToDo): string{
+		return toDo.editable? 'text': 'move';
+	}
+	
+	/**
+	 * Saves todo.
+	 */
 	saveToDo(toDo: ToDo): void{
 		this.savePromise(toDo)
 			.then((saved: ToDo) => {
-				toDo.author = saved.author;
 				showToast('To-Do saved!!', 4000);
-				//readjustPanels();
-
+				readjustPanels();
 			})
 	}
 	
+	/**
+	 * Returns a promise with the payload todo object
+	 * prepared from input todo.
+	 */
 	savePromise(toDo: ToDo): Promise<ToDo>{
 		var element = document.getElementById(toDo._id);
 		var toSave = new ToDo();
@@ -112,12 +143,19 @@ export class ToDoListComponent implements OnInit{
 		toSave.status = toDo.status;
 		if (toDo._id)
 			toSave.id = toDo._id;
-		toSave.title = element.querySelector(".title").innerHTML;
-		toSave.description = element.querySelector(".description").innerHTML;
+		delete toSave.deletable;
+		delete toSave.editable;
+		if (toDo.editable){
+			toSave.title = element.querySelector(".title").innerHTML;
+			toSave.description = element.querySelector(".description").innerHTML;
+		}
 		
 		return this.toDoListService.saveToDo(toSave);
 	}
 	
+	/**
+	 * Deletes todo, and updates both lists.
+	 */
 	deleteToDo(toDo: ToDo): void{
 		var toDelete = new ToDo();
 		toDelete.id = toDo._id;
@@ -135,22 +173,60 @@ export class ToDoListComponent implements OnInit{
 						this.complete = this.complete.filter((td) => {
 							return td._id !== toDo._id;
 						})
-					//readjustPanels();
+					readjustPanels();
 				}, 200);
 			});
 	}
 	
+	/**
+	 * Prevents default.
+	 */
 	onDragOver(event: any): void{
 		event.preventDefault();
 	}
 
+	/**
+	 * Updates item being dragged.
+	 */
 	onDrag(toDo: ToDo): void{
 		this.draggingToDo = toDo;
 	}
 	
-	onDropComplete(event: any): void{
+	/**
+	 * Checks if target list is different from source list.
+	 * If this is the case, proceeds to save, and move todo
+	 * to appropriate list.
+	 */
+	onDrop(event: any): void{
 		event.preventDefault();
 		
+		var target = getTarget(event.screenX);
+		var source = this.getSource();
+		
+		if (target !== source && target === 'rightBucket')
+			this.moveToComplete();
+		if (target !== source && target === 'leftBucket')
+			this.moveToIncomplete();
+	}
+	
+	/**
+	 * Gets the source list of item being dragged.
+	 */
+	getSource(): string{
+		var left = this.incomplete.filter((toDo: ToDo) => {
+				return this.draggingToDo === toDo;
+		});
+		
+		if (left.length != 0)
+			return 'leftBucket';
+		else
+			return 'rightBucket';
+	}	
+	
+	/**
+	 * Saves item being dragged, and moves it to complete.
+	 */
+	moveToComplete(): void{
 		var self = this;
 		this.draggingToDo.status = COMPLETE;
 		this.savePromise(this.draggingToDo)
@@ -160,15 +236,19 @@ export class ToDoListComponent implements OnInit{
 				this.incomplete = this.incomplete.filter((td) => {
 						return td._id !== this.draggingToDo._id;
 					});
-					
+				
+				this.draggingToDo.title = saved.title;
+				this.draggingToDo.description = saved.description;
 				this.complete.push(this.draggingToDo);
-				//readjustPanels();
+				readjustPanels();
+				setInlineEditor();
 			});
 	}
 
-	onDropIncomplete(event: any): void{
-		event.preventDefault();
-		
+	/**
+	 * Saves item being dragged, and moves it to incomplete.
+	 */
+	moveToIncomplete(): void{
 		this.draggingToDo.status = INCOMPLETE;
 		this.savePromise(this.draggingToDo)
 			.then((saved: ToDo) => {
@@ -178,13 +258,16 @@ export class ToDoListComponent implements OnInit{
 						return td._id !== this.draggingToDo._id;
 					});
 					
+				this.draggingToDo.title = saved.title;
+				this.draggingToDo.description = saved.description;
 				this.incomplete.push(this.draggingToDo);
-				//readjustPanels();
+				readjustPanels();
+				setInlineEditor();
 			});
 	}
 	
 	/**
-	 * Signs out from the app.
+	 * Signs out user from the app.
 	 */
 	signOut(): void{
 		this.toDoListService.signOut()

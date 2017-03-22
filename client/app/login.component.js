@@ -26,13 +26,13 @@ var LoginComponent = (function () {
      */
     LoginComponent.prototype.ngOnInit = function () {
         this.user = new user_1.User();
-        this.user.username = 'ali';
+        this.user.username = 'harry';
         this.user.password = '5f4dcc3b5aa765d61d8327deb882cf99';
         setFadeInAnimation('#loginForm');
     };
     ;
     /**
-     * Signs into the video list page with current user info.
+     * Signs into the todo list page with current user info.
      */
     LoginComponent.prototype.signIn = function (user) {
         var _this = this;
@@ -40,6 +40,7 @@ var LoginComponent = (function () {
             .then(function (res) {
             _this.toDoListService.sessionId = res.json().sessionId;
             if (res.json().sessionId) {
+                var author = {};
                 _this.ref.tick();
                 _this.router.navigate(['/toDoList']);
             }

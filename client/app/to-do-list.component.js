@@ -13,6 +13,7 @@ var to_do_list_service_1 = require('./to-do-list.service');
 var to_do_1 = require('./to-do');
 var router_1 = require('@angular/router');
 require('app/commons.js');
+// Constants represents the only 2 todo states
 var INCOMPLETE = 'notCompleted';
 var COMPLETE = 'completed';
 var ToDoListComponent = (function () {
@@ -28,6 +29,17 @@ var ToDoListComponent = (function () {
         var _this = this;
         this.toDoListService.getToDoList(null, null)
             .then(function (toDoList) {
+            for (var i in toDoList) {
+                if (toDoList[i].author.username
+                    === _this.toDoListService.loggedInUser.username) {
+                    toDoList[i].deletable = true;
+                    toDoList[i].editable = true;
+                }
+                else {
+                    toDoList[i].deletable = false;
+                    toDoList[i].editable = false;
+                }
+            }
             _this.incomplete = toDoList.filter(function (toDo) {
                 return toDo.status === INCOMPLETE;
             });
@@ -38,8 +50,8 @@ var ToDoListComponent = (function () {
             setListAnimation('#incompleteList', true);
             setListAnimation('#completeList', false);
             setFadeInAnimation('#addButton');
-            showToast('To-dos loaded!!', 4000);
-            //readjustPanels();
+            showToast('Welcome back, ' + _this.toDoListService.loggedInUser.username + '!!', 4000);
+            readjustPanels();
         });
     };
     /**
@@ -53,31 +65,56 @@ var ToDoListComponent = (function () {
         this.blankToDo.description = 'Enter Description';
         this.toDoListService.saveToDo(this.blankToDo)
             .then(function (toDo) {
+            toDo.editable = true;
+            toDo.deletable = true;
             _this.incomplete.push(toDo);
             setFadeInAnimation('#' + toDo._id + 'Card');
             showToast('To-Do added!!', 4000);
             setInlineEditor();
-            //readjustPanels();
+            readjustPanels();
+            setTimeout(function () {
+                window.scrollTo(0, document.body.scrollHeight);
+            }, 0);
         });
     };
+    /**
+     * Gets the cursor for the todo according to the value
+     * of field 'editable'
+     */
+    ToDoListComponent.prototype.getCursor = function (toDo) {
+        return toDo.editable ? 'text' : 'move';
+    };
+    /**
+     * Saves todo.
+     */
     ToDoListComponent.prototype.saveToDo = function (toDo) {
         this.savePromise(toDo)
             .then(function (saved) {
-            toDo.author = saved.author;
             showToast('To-Do saved!!', 4000);
-            //readjustPanels();
+            readjustPanels();
         });
     };
+    /**
+     * Returns a promise with the payload todo object
+     * prepared from input todo.
+     */
     ToDoListComponent.prototype.savePromise = function (toDo) {
         var element = document.getElementById(toDo._id);
         var toSave = new to_do_1.ToDo();
         toSave.status = toDo.status;
         if (toDo._id)
             toSave.id = toDo._id;
-        toSave.title = element.querySelector(".title").innerHTML;
-        toSave.description = element.querySelector(".description").innerHTML;
+        delete toSave.deletable;
+        delete toSave.editable;
+        if (toDo.editable) {
+            toSave.title = element.querySelector(".title").innerHTML;
+            toSave.description = element.querySelector(".description").innerHTML;
+        }
         return this.toDoListService.saveToDo(toSave);
     };
+    /**
+     * Deletes todo, and updates both lists.
+     */
     ToDoListComponent.prototype.deleteToDo = function (toDo) {
         var _this = this;
         var toDelete = new to_do_1.ToDo();
@@ -96,19 +133,54 @@ var ToDoListComponent = (function () {
                     _this.complete = _this.complete.filter(function (td) {
                         return td._id !== toDo._id;
                     });
-                //readjustPanels();
+                readjustPanels();
             }, 200);
         });
     };
+    /**
+     * Prevents default.
+     */
     ToDoListComponent.prototype.onDragOver = function (event) {
         event.preventDefault();
     };
+    /**
+     * Updates item being dragged.
+     */
     ToDoListComponent.prototype.onDrag = function (toDo) {
         this.draggingToDo = toDo;
     };
-    ToDoListComponent.prototype.onDropComplete = function (event) {
-        var _this = this;
+    /**
+     * Checks if target list is different from source list.
+     * If this is the case, proceeds to save, and move todo
+     * to appropriate list.
+     */
+    ToDoListComponent.prototype.onDrop = function (event) {
         event.preventDefault();
+        var target = getTarget(event.screenX);
+        var source = this.getSource();
+        if (target !== source && target === 'rightBucket')
+            this.moveToComplete();
+        if (target !== source && target === 'leftBucket')
+            this.moveToIncomplete();
+    };
+    /**
+     * Gets the source list of item being dragged.
+     */
+    ToDoListComponent.prototype.getSource = function () {
+        var _this = this;
+        var left = this.incomplete.filter(function (toDo) {
+            return _this.draggingToDo === toDo;
+        });
+        if (left.length != 0)
+            return 'leftBucket';
+        else
+            return 'rightBucket';
+    };
+    /**
+     * Saves item being dragged, and moves it to complete.
+     */
+    ToDoListComponent.prototype.moveToComplete = function () {
+        var _this = this;
         var self = this;
         this.draggingToDo.status = COMPLETE;
         this.savePromise(this.draggingToDo)
@@ -117,13 +189,18 @@ var ToDoListComponent = (function () {
             _this.incomplete = _this.incomplete.filter(function (td) {
                 return td._id !== _this.draggingToDo._id;
             });
+            _this.draggingToDo.title = saved.title;
+            _this.draggingToDo.description = saved.description;
             _this.complete.push(_this.draggingToDo);
-            //readjustPanels();
+            readjustPanels();
+            setInlineEditor();
         });
     };
-    ToDoListComponent.prototype.onDropIncomplete = function (event) {
+    /**
+     * Saves item being dragged, and moves it to incomplete.
+     */
+    ToDoListComponent.prototype.moveToIncomplete = function () {
         var _this = this;
-        event.preventDefault();
         this.draggingToDo.status = INCOMPLETE;
         this.savePromise(this.draggingToDo)
             .then(function (saved) {
@@ -131,12 +208,15 @@ var ToDoListComponent = (function () {
             _this.complete = _this.complete.filter(function (td) {
                 return td._id !== _this.draggingToDo._id;
             });
+            _this.draggingToDo.title = saved.title;
+            _this.draggingToDo.description = saved.description;
             _this.incomplete.push(_this.draggingToDo);
-            //readjustPanels();
+            readjustPanels();
+            setInlineEditor();
         });
     };
     /**
-     * Signs out from the app.
+     * Signs out user from the app.
      */
     ToDoListComponent.prototype.signOut = function () {
         this.toDoListService.signOut()

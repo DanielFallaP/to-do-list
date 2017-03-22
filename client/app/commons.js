@@ -2,42 +2,24 @@
  * Shows toast notification.
  */
 function showToast(message, delay){
-	Materialize.toast(message, delay, 'rounded');
+	Materialize.toast(message, delay
+	);
 }
 
 /**
- * Sets ScrollFire option for the video list.
+ * Sets inline editor for appropriate elements.
  */
-function setScrollFire(offset, callback){
-	var options = [
-		{selector: '#videoList', offset: offset, callback: callback}
-	]
-	Materialize.scrollFire(options);
-}
-
-/**
- * Pauses video playback.
- */
-function stopPlayback(videoId){
-	if (videoId)
-		document.getElementById(videoId).pause();
-}
-
-function setAnimation(el){
-	if (el)
-		Materialize.fadeInImage($(el));
-}
-
-function setCollapseButton(el){
-	$(".button-collapse").sideNav();
-}
-
 function setInlineEditor(){
 	setTimeout(function () {
 		new MediumEditor('.editable');
 	}, 0);
 }
 
+/**
+ * Sets staggered animation for list.
+ * Makes it appear from LHS or RHS according 
+ * to parameter.
+ */
 function setListAnimation(el, left){
 	if (el){
 		setTimeout(function () {
@@ -46,6 +28,9 @@ function setListAnimation(el, left){
 	}
 }
 
+/**
+ * Sets fade in animation.
+ */
 function setFadeInAnimation(el){
 	if (el){
 		setTimeout(function () {
@@ -54,6 +39,9 @@ function setFadeInAnimation(el){
 	}
 }
 
+/**
+ * Applies staggered animation to list.
+ */
 function showStaggered(selectorOrEl, left){
 	var element;
     if (typeof(selectorOrEl) === 'string') {
@@ -76,12 +64,31 @@ function showStaggered(selectorOrEl, left){
     });
 }
 
+/**
+ * Shows only left or right bucket border
+ * according to the tallest one.
+ */
 function readjustPanels(){
 	setTimeout(function(){
 		var left = document.getElementById('leftBucket');
 		var right = document.getElementById('rightBucket');
-		var maxHeight = Math.max($('#leftBucket').height(), $('#rightBucket').height());
-		left.style.height = maxHeight + 'px';
-		right.style.height = maxHeight + 'px';
-	},1000);
+		if ($('#leftBucket').height() > $('#rightBucket').height()){
+			left.className = "col s6 rightDivider";
+			right.className = "col s6";	
+		}
+		else{
+			right.className = "col s6 leftDivider";
+			left.className = "col s6";
+		}
+	}, 0);
+}
+
+/**
+ * Gets the target of a drag and drop operation.
+ */
+function getTarget(x){
+	if ($(document).width() / 2 > x)
+		return 'leftBucket';
+	else
+		return 'rightBucket';
 }

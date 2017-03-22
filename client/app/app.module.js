@@ -18,7 +18,7 @@ var login_component_1 = require('./login.component');
 var app_routing_module_1 = require('./app-routing.module');
 var angular2_materialize_1 = require('angular2-materialize');
 var forms_1 = require('@angular/forms');
-//Imports modules, components, services and bootstrap component
+//Imports modules, components, services and the bootstrap component
 var AppModule = (function () {
     function AppModule() {
     }

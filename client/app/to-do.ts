@@ -18,12 +18,14 @@ export class ToDo{
 	description: string;
   
 	// Todo's author
-	author: string;
+	author: any;
   
 	// Todo's status
 	status: string;
- 
-	// Flag indicating whether this is the last item.
-	// Used to append a new todo.
-	lastItem: boolean = false;
+	
+	// Indicates whether this is deletable 	
+	deletable: boolean = false;
+	
+	// Indicates whether this is editable
+	editable: boolean = false;
 }

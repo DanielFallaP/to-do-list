@@ -21,7 +21,7 @@ var ToDoListService = (function () {
         this.router = router;
     }
     /**
-     * Gets the videos by paging if appropriate parameters are present.
+     * Gets the todos by paging if appropriate parameters are present.
      */
     ToDoListService.prototype.getToDoList = function (skip, limit) {
         var params = new http_1.URLSearchParams();
@@ -45,6 +45,8 @@ var ToDoListService = (function () {
             'Accept': 'application/json'
         });
         var options = new http_1.RequestOptions({ headers: headers });
+        this.loggedInUser = {};
+        this.loggedInUser.username = user.username;
         return this.http.post('user/auth', user, options)
             .toPromise()
             .catch(this.handleError);
@@ -53,6 +55,7 @@ var ToDoListService = (function () {
      * Creates/updates todo in DB.
      */
     ToDoListService.prototype.saveToDo = function (toDo) {
+        var _this = this;
         var params = new http_1.URLSearchParams();
         params.set('sessionId', this.sessionId);
         var headers = new http_1.Headers({
@@ -62,9 +65,17 @@ var ToDoListService = (function () {
         var options = new http_1.RequestOptions({ headers: headers, search: params });
         return this.http.put('todo', toDo, options)
             .toPromise()
-            .then(function (res) { return res.json().data; })
+            .then(function (res) {
+            var newToDo = res.json().data;
+            if (!toDo.author || !toDo.author.username)
+                newToDo.author = _this.loggedInUser;
+            return newToDo;
+        })
             .catch(this.handleError);
     };
+    /**
+     * Deletes todo in DB.
+     */
     ToDoListService.prototype.deleteToDo = function (toDo) {
         var params = new http_1.URLSearchParams();
         params.set('sessionId', this.sessionId);
@@ -79,7 +90,7 @@ var ToDoListService = (function () {
             .catch(this.handleError);
     };
     /**
-     * Signs out of the app.
+     * Signs out user from the app.
      */
     ToDoListService.prototype.signOut = function () {
         var params = new http_1.URLSearchParams();

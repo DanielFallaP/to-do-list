@@ -15,7 +15,6 @@ import 'app/commons.js'
   moduleId: module.id,
   selector: 'login',
   templateUrl: 'login.component.html',
-  //styleUrls: ['main-grid.component.css']
 })
 
 /**
@@ -36,19 +35,21 @@ export class LoginComponent implements OnInit{
    */
   ngOnInit(): void{
 	this.user = new User();
-	this.user.username = 'ali';
+	this.user.username = 'harry';
 	this.user.password = '5f4dcc3b5aa765d61d8327deb882cf99'
 	setFadeInAnimation('#loginForm');
   };
   
   /**
-   * Signs into the video list page with current user info.
+   * Signs into the todo list page with current user info.
    */
   signIn(user: User): void{
 	this.toDoListService.signIn(user)
 		.then((res: Response) => {
 				this.toDoListService.sessionId = res.json().sessionId;
 			if (res.json().sessionId){
+				var author: any = {
+				};
 				this.ref.tick();
 				this.router.navigate(['/toDoList']);
 

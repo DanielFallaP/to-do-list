@@ -14,17 +14,17 @@ export class ToDoListService{
 	constructor(private http:Http,
 		private router: Router){}
 	
-	//Logged in user session Id
+	// Logged in user session Id
 	sessionId: string;
 	
-	//Current video being played in the details
-	currentToDo: ToDo;
-	
-	//Array of loaded videos
+	// Array of loaded todos
 	todos: ToDo[];
 	
+	// User currently in session
+	loggedInUser: any;
+	
 	/**
-	 * Gets the videos by paging if appropriate parameters are present.
+	 * Gets the todos by paging if appropriate parameters are present.
 	 */
 	getToDoList(skip: number, limit: number) : Promise<ToDo[]> {
 		let params: URLSearchParams = new URLSearchParams();
@@ -50,7 +50,8 @@ export class ToDoListService{
 			'Accept': 'application/json'
 		}); 
 		let options = new RequestOptions({ headers: headers });
-		
+		this.loggedInUser = {};
+		this.loggedInUser.username = user.username;
 		return this.http.post('user/auth', user, options)
 			.toPromise()
 			.catch(this.handleError);
@@ -72,10 +73,18 @@ export class ToDoListService{
 
 		return this.http.put('todo', toDo, options)
 			.toPromise()
-			.then((res: Response) => res.json().data as ToDo)
+			.then((res: Response) => {
+				var newToDo = res.json().data;
+				if (!toDo.author || !toDo.author.username)
+					newToDo.author = this.loggedInUser;
+				return newToDo as ToDo;
+			})
 			.catch(this.handleError);
 	}
 	
+	/**
+	 * Deletes todo in DB.
+	 */
 	deleteToDo(toDo: ToDo) : Promise<ToDo> {
 		let params: URLSearchParams = new URLSearchParams();
 		params.set('sessionId', this.sessionId);
@@ -95,7 +104,7 @@ export class ToDoListService{
 	
 	
 	/**
-	 * Signs out of the app.
+	 * Signs out user from the app.
 	 */
 	signOut(): Promise<any> {
 		let params: URLSearchParams = new URLSearchParams();
