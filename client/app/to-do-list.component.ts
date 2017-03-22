@@ -37,16 +37,19 @@ export class ToDoListComponent implements OnInit{
 				private router: Router){}
 	
 	// Represents the incomplete todos
-	private incomplete: ToDo[];
+	incomplete: ToDo[];
 	
 	// Represents the complete todos
-	private complete: ToDo[];
+	complete: ToDo[];
 	
 	// Represents a blank to do to add
-	private blankToDo: ToDo;
+	blankToDo: ToDo;
 	
 	// Todo being dragged
-	private draggingToDo: ToDo;
+	draggingToDo: ToDo;
+	
+	// Logged-in user
+	loggedInUser: any;
 
 	/**
 	 * Loads todos, splits thems in two according to 
@@ -56,9 +59,10 @@ export class ToDoListComponent implements OnInit{
 		
 		this.toDoListService.getToDoList(null, null)
 			.then((toDoList: ToDo[]) => {
+				this.loggedInUser = this.toDoListService.loggedInUser;
 				for (var i in toDoList){
 					if (toDoList[i].author.username 
-						=== this.toDoListService.loggedInUser.username){
+						=== this.loggedInUser.username){
 						toDoList[i].deletable = true;
 						toDoList[i].editable = true;
 					}
@@ -81,7 +85,7 @@ export class ToDoListComponent implements OnInit{
 				setListAnimation('#completeList', false);
 				setFadeInAnimation('#addButton');
 				
-				showToast('Welcome back, ' + this.toDoListService.loggedInUser.username + '!!' , 4000);
+				showToast('Welcome back, ' + this.loggedInUser.username + '!!' , 4000);
 				readjustPanels();
 			});
 	}
@@ -108,7 +112,7 @@ export class ToDoListComponent implements OnInit{
 				setInlineEditor();
 				readjustPanels();
 				setTimeout(() => {
-					window.scrollTo(0, document.body.scrollHeight);
+					window.scrollTo(0, document.getElementById('incompleteList').scrollHeight);
 				}, 0);
 			});
 	}

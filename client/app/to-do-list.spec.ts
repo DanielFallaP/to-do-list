@@ -15,49 +15,88 @@ import 'app/mocks/commons-mock.js';
 
 var toDoList: ToDo[];
 
+// Constants represents the only 2 todo states
+const INCOMPLETE = 'notCompleted';
+const COMPLETE = 'completed';
+
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
 /**
+  * Router mockup
+  */
+class MockedRouter{
+}
+
+/**
   * ToDo service mockup
   */
 class MockToDoListService {
   
-	getToDos(skip: number, limit: number): Promise<ToDo[]>{
-		toDoList = [];
+	// Mocks logged in user
+    loggedInUser: any = {
+		username: 'ali'
+	}
+	
+	// Mocks get list method
+	getToDoList(skip: number, limit: number): Promise<ToDo[]>{
+		var response: ToDo[] = [];
+
 		let toDo1 = new ToDo();
-		
-		
+		toDo1._id = '1';
+		toDo1.description = '';
+		toDo1.title = '';
+		toDo1.status = INCOMPLETE;
+		toDo1.author = {"_id":"5757e6e41b0a244b256ac1d6", "username":"harry"};
+		response.push(toDo1);
+			
 		let toDo2 = new ToDo();
+		toDo2._id = '2';
+		toDo2.description = '';
+		toDo2.title = '';
+		toDo2.status = INCOMPLETE;
+		toDo2.author = {"_id":"5757e6e41b0a244b256ac1d5", "username":"ali"};
+		response.push(toDo2);
 		
 		let toDo3 = new ToDo();
+		toDo3._id = '3';
+		toDo3.description = '';
+		toDo3.title = '';
+		toDo3.status = INCOMPLETE;
+		toDo3.author = {"_id":"5757e6e41b0a244b256ac1d6", "username":"harry"};
+		response.push(toDo3);
 		
 		let toDo4 = new ToDo();
+		toDo4._id = '4';
+		toDo4.description = '';
+		toDo4.title = '';
+		toDo4.status = COMPLETE;
+		toDo4.author = {"_id":"5757e6e41b0a244b256ac1d5", "username":"ali"};
+		response.push(toDo4);
 		
 		let toDo5 = new ToDo();
-		
-		
-		let toDo6 = new ToDo();
-		
-		let toDo7 = new ToDo();
-		
-		
-		let toDo8 = new ToDo();
-		
-		
-		var response: ToDo[] = [];
-		
-		var end = skip + limit;
-		for (var i = skip; i < end; i++){
-			response.push(toDoList[i]);
-		}
+		toDo5._id = '5';
+		toDo5.description = '';
+		toDo5.title = '';
+		toDo5.status = COMPLETE;
+		toDo5.author = {"_id":"5757e6e41b0a244b256ac1d5", "username":"ali"};
+		response.push(toDo5);
 		
 		return Promise.resolve(response);
 	}
 	
-	testMethod(): void {
+	// Mocks save method
+	saveToDo(toDo: ToDo): Promise<ToDo> {
+		if (toDo._id == undefined || toDo._id == null)
+			toDo._id = new Date().getTime().toString();
+		return Promise.resolve(toDo);
+	}
+	
+	// Mocks delete method
+	deleteToDo(toDo: ToDo) : Promise<ToDo> {
+		return Promise.resolve(toDo);
 	}
 }
 
@@ -80,85 +119,314 @@ describe('Testing ToDo List Component', () => {
       ],
       providers: [
         { provide: ToDoListService, useClass: MockToDoListService },
+		{ provide: Router, useClass: MockedRouter }
 	]
     }).compileComponents();
   }));
   
   beforeEach(() => {
     fixture = TestBed.createComponent(ToDoListComponent);
+	let loggedInUser: User = new User();
+	loggedInUser.username = 'ali';
+	
+	fixture.componentInstance.loggedInUser = loggedInUser;
+
     fixture.detectChanges();
   });
 
-  /*
-  it('Should calculate rating for all toDoList after load', async(inject([], () => {
+  it('Should load items into complete and incomplete lists correctly', async(inject([], () => {
     
-	fixture.whenStable()
-      .then(() => {
-        fixture.detectChanges();
-        return fixture.whenStable();
-      })
-      .then(() => {
-		expect(fixture.componentInstance.toDoList[0][0].rating).toEqual(3);
-		expect(fixture.componentInstance.toDoList[0][1].rating).toEqual(4);
-		expect(fixture.componentInstance.toDoList[1][0].rating).toEqual(0);
-      });
-  })));
-  
-  it('Should stop playback if playing toDo is different', async(inject([], () => {
-	fixture.whenStable()
-      .then(() => {
-        fixture.detectChanges();
-        return fixture.whenStable();
-      })
-      .then(() => {
-		var instance = fixture.componentInstance;
-		instance.updatePlayingToDo(instance.toDoList[0][0]);
-		var firstplayed = instance.playingToDo;
-		instance.updatePlayingToDo(instance.toDoList[0][1]);
-		expect(firstplayed === instance.playingToDo).toBe(false);
-	  });
-  })));
-  
-  it('Should not stop playback if playing toDo is different', async(inject([], () => {
-	fixture.whenStable()
-      .then(() => {
-        fixture.detectChanges();
-        return fixture.whenStable();
-      })
-      .then(() => {
-		var instance = fixture.componentInstance;
-		instance.updatePlayingToDo(instance.toDoList[0][0]);
-		var firstplayed = instance.playingToDo;
-		instance.updatePlayingToDo(instance.toDoList[0][0]);
-		expect(firstplayed === instance.playingToDo).toBe(true);
-	  });
-  })));
-  
-  it('Should add more toDoList correctly to original list', async(inject([], () => {
 	var instance = fixture.componentInstance;
 	fixture.whenStable()
       .then(() => {
         fixture.detectChanges();
-		var size = 0;
-		for (var i in instance.toDoList){
-			for (var j in instance.toDoList[i]){
-				size ++;
-			}
-		}
 		
-		expect(size).toBe(4);
-		instance.getMoreToDos(null);
+		expect(instance.incomplete.length).toBe(3);	
+		expect(instance.complete.length).toBe(2);
+	
+        return fixture.whenStable();
+      })
+  })));
+  
+  it('Should load item permissions properly', async(inject([], () => {
+    
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+		var editable = instance.incomplete.filter((toDo: ToDo) => {
+			return toDo.editable === true;
+		}).length;
+		
+		editable += instance.complete.filter((toDo: ToDo) => {
+			return toDo.editable === true;
+		}).length;
+		
+		var deletable = instance.incomplete.filter((toDo: ToDo) => {
+			return toDo.deletable === true;
+		}).length;
+		
+		deletable += instance.complete.filter((toDo: ToDo) => {
+			return toDo.deletable === true;
+		}).length;
+		
+		expect(editable).toBe(3);
+		expect(deletable).toBe(3);	
+
+		
+        return fixture.whenStable();
+      })
+  })));
+  
+  it('Should get mouse cursor correctly according to permissions', async(inject([], () => {
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+        return fixture.whenStable();
+      })
+      .then(() => {
+		  let toDo: ToDo = new ToDo();
+		  toDo.editable = true;
+		  
+		  expect(instance.getCursor(toDo)).toBe('text');
+		  
+		  toDo.editable = false;
+		  
+		  expect(instance.getCursor(toDo)).toBe('move');
+	  });
+  })));
+  
+  it('Should save title and description', async(inject([], () => {
+	var instance = fixture.componentInstance;
+	var toDo: ToDo;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+        return fixture.whenStable();
+      })
+	  .then(() => {
+        fixture.detectChanges();
+	    toDo = instance.incomplete[0];
+		toDo.editable = true;
+		toDo.title = 'new title';
+		toDo.description = 'new description';
+		
+		instance.saveToDo(toDo);  
+        return fixture.whenStable();
+      })
+      .then(() => {
+		  expect(instance.incomplete[0].title).toBe('new title');
+		  
+		  toDo.editable = false;
+		  
+		  expect(instance.incomplete[0].description).toBe('new description');
+	  });
+  })));
+  
+  it('Should delete items correctly from incomplete list', async(inject([], () => {
+	var instance = fixture.componentInstance;
+	var toDelete: ToDo;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+        return fixture.whenStable();
+      })
+      .then(() => {
+			toDelete = instance.incomplete[0];
+			instance.deleteToDo(toDelete);
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			fixture.detectChanges();
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			setTimeout(() => {
+				var filtered: any = instance.incomplete.filter((toDo: ToDo) => {
+					return toDo === toDelete;
+				});
+				expect(instance.incomplete.length).toBe(2);
+				expect(filtered.length).toBe(0);
+			},400)
+	  });
+  })));
+  
+  it('Should delete items correctly from complete list', async(inject([], () => {
+	var instance = fixture.componentInstance;
+	var toDelete: ToDo;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+        return fixture.whenStable();
+      })
+      .then(() => {
+			toDelete = instance.complete[0];
+			instance.deleteToDo(toDelete);
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			setTimeout(() => {
+				var filtered: any = instance.complete.filter((toDo: ToDo) => {
+					return toDo === toDelete;
+				});
+				expect(instance.complete.length).toBe(1);
+				expect(filtered.length).toBe(0);
+			}, 400);
+	  });
+  })));
+  
+  it('Should add an item correctly, and it should be editable and deletable', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+        return fixture.whenStable();
+      })
+      .then(() => {
+			instance.addToDo();
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			var added = instance.incomplete.filter((toDo: ToDo) => {
+				return toDo._id.length !== 1;
+			})[0];
+			expect(instance.incomplete.length).toBe(4);
+			expect(added.editable).toBe(true);
+			expect(added.editable).toBe(true);
+			
+			return fixture.whenStable();
+
+	  });
+  })));
+  
+  it('Should get source bucket correctly', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+		
+        return fixture.whenStable();
+      })
+	  .then(() => {
+			instance.draggingToDo = instance.incomplete[0];
+			
+			expect(instance.getSource()).toBe('leftBucket');
+			
+			instance.draggingToDo = instance.complete[0];
+			
+			expect(instance.getSource()).toBe('rightBucket');
+			
+			return fixture.whenStable();
+
+	  });
+  })));
+  
+  it('Should move item to incomplete list correctly', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
 		
         return fixture.whenStable();
       })
       .then(() => {
-		var size = 0;
-		for (var i in instance.toDoList){
-			for (var j in instance.toDoList[i]){
-				size ++;
-			}
-		}
-		expect(size).toBe(8);
+			var toComplete: ToDo = instance.incomplete[0];
+			instance.draggingToDo = toComplete;
+			instance.moveToComplete();
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			expect(instance.incomplete.length).toBe(2);
+			expect(instance.complete.length).toBe(3);
+			
+			return fixture.whenStable();
+
 	  });
-  })));*/
+  })));
+  
+  it('Should move item to complete list correctly', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+		
+        return fixture.whenStable();
+      })
+      .then(() => {
+			var toIncomplete: ToDo = instance.complete[0];
+			instance.draggingToDo = toIncomplete;
+			instance.moveToIncomplete();
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			expect(instance.incomplete.length).toBe(4);
+			expect(instance.complete.length).toBe(1);
+			
+			return fixture.whenStable();
+
+	  });
+  })));
+  
+  it('Should drop item to incomplete list correctly', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+		
+        return fixture.whenStable();
+      })
+      .then(() => {
+			instance.draggingToDo = instance.complete[0];
+			
+			var event: any = { screenX : 0, preventDefault : function(){}};
+			instance.onDrop(event);
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			expect(instance.incomplete.length).toBe(4);
+			expect(instance.complete.length).toBe(1);
+			
+			return fixture.whenStable();
+
+	  });
+  })));
+  
+  it('Should drop item to complete list correctly', async(inject([], () => {
+	
+	var instance = fixture.componentInstance;
+	fixture.whenStable()
+      .then(() => {
+        fixture.detectChanges();
+		
+        return fixture.whenStable();
+      })
+      .then(() => {
+			instance.draggingToDo = instance.incomplete[0];
+			
+			var event: any = { screenX : 5000, preventDefault : function(){}};
+			instance.onDrop(event);
+			
+			return fixture.whenStable();
+	  })
+	  .then(() => {
+			expect(instance.incomplete.length).toBe(2);
+			expect(instance.complete.length).toBe(3);
+			
+			return fixture.whenStable();
+
+	  });
+  })));
+ 
 });

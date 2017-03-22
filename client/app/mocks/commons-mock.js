@@ -41,4 +41,8 @@ function readjustPanels(){
  * Gets the target of a drag and drop operation.
  */
 function getTarget(x){
+	if (5000 / 2 > x)
+		return 'leftBucket';
+	else
+		return 'rightBucket';
 }

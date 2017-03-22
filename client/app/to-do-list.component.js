@@ -29,9 +29,10 @@ var ToDoListComponent = (function () {
         var _this = this;
         this.toDoListService.getToDoList(null, null)
             .then(function (toDoList) {
+            _this.loggedInUser = _this.toDoListService.loggedInUser;
             for (var i in toDoList) {
                 if (toDoList[i].author.username
-                    === _this.toDoListService.loggedInUser.username) {
+                    === _this.loggedInUser.username) {
                     toDoList[i].deletable = true;
                     toDoList[i].editable = true;
                 }
@@ -50,7 +51,7 @@ var ToDoListComponent = (function () {
             setListAnimation('#incompleteList', true);
             setListAnimation('#completeList', false);
             setFadeInAnimation('#addButton');
-            showToast('Welcome back, ' + _this.toDoListService.loggedInUser.username + '!!', 4000);
+            showToast('Welcome back, ' + _this.loggedInUser.username + '!!', 4000);
             readjustPanels();
         });
     };
@@ -73,7 +74,7 @@ var ToDoListComponent = (function () {
             setInlineEditor();
             readjustPanels();
             setTimeout(function () {
-                window.scrollTo(0, document.body.scrollHeight);
+                window.scrollTo(0, document.getElementById('incompleteList').scrollHeight);
             }, 0);
         });
     };
