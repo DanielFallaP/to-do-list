@@ -10,9 +10,10 @@ import { Headers, Http, RequestOptions, Response } from '@angular/http';
 import { Router } from '@angular/router';
 
 import 'app/commons.js'
- 
+declare var __moduleName: string;
+
 @Component({
-  moduleId: module.id,
+  moduleId: __moduleName,
   selector: 'login',
   templateUrl: 'login.component.html',
 })

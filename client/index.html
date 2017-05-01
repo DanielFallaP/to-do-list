@@ -12,22 +12,28 @@
     <link type="text/css" rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.css" media="screen,projection" />
 	<link type="text/css" rel="stylesheet" href="transitions.css" media="screen,projection" />
 
+	<!-- build:vendor -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
 	<script src="node_modules/medium-editor/dist/js/medium-editor.js"></script>
 	
-    <!-- Polyfill(s) for older browsers -->
     <script src="node_modules/core-js/client/shim.min.js"></script>
 
     <script src="node_modules/zone.js/dist/zone.js"></script>
     <script src="node_modules/reflect-metadata/Reflect.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
+	<!-- endbuild -->
+	
 	<style>
 		.medium-editor-toolbar{
 			display: none
 		}
 	</style>
+	
+	<!-- build:app -->
     <script src="systemjs.config.js"></script>
+	<!-- endbuild -->
+
     <script>
       System.import('app').catch(function(err){ console.error(err); });   
     </script>

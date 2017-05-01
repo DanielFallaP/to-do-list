@@ -50,6 +50,7 @@
         },
       app: {
         main: './main.js',
+		 //format: 'register',
         defaultExtension: 'js'
       },
       rxjs: {

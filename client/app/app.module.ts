@@ -7,7 +7,6 @@ import { ToDoListComponent } from './to-do-list.component';
 import { LoginComponent } from './login.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
-import { MaterializeDirective } from 'angular2-materialize';
 import { FormsModule }   from '@angular/forms';
 
 //Imports modules, components, services and the bootstrap component
@@ -21,8 +20,7 @@ import { FormsModule }   from '@angular/forms';
   declarations: [
     AppComponent,
     ToDoListComponent,
-	LoginComponent,
-    MaterializeDirective
+	LoginComponent	
   ],
   providers: [
     ToDoListService

@@ -7,6 +7,7 @@ declare function readjustPanels(): void;
 declare function getTarget(x: number): string;
 declare var Math: any;
 declare var document: any;
+declare var __moduleName: string;
 
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
@@ -22,7 +23,7 @@ const INCOMPLETE = 'notCompleted';
 const COMPLETE = 'completed';
 
 @Component({
-  moduleId: module.id,
+  moduleId: __moduleName,
   selector: 'to-do-list',
   templateUrl: 'to-do-list.component.html',
   styleUrls: ['to-do-list.component.css']

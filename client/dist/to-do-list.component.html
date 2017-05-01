@@ -1,0 +1,132 @@
+<!-- Navigation Bar -->
+<nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container">
+		<a id="logo-container" href="#" class="brand-logo">
+			&nbsp;
+			<i class="material-icons" style="font-size: 34px; margin-right:0px; margin-left: 10px">
+				assignment
+			</i>
+			Things to Do
+		</a>
+      <ul class="right hide-on-med-and-down" style="cursor: pointer;  margin-right: 12px" (click)="signOut()">
+		<li><i class="material-icons">power_settings_new</i></li>		
+	  </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#!">Navbar Link</a></li>
+      </ul>
+      <a style="cursor: pointer;" (click)="signOut()" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">power_settings_new</i></a>
+    </div>
+</nav>
+<div class="container" style="margin-top: 10px;" (drop) = "onDrop($event)" 
+	(dragover) = "onDragOver($event)">
+	<div class="row">
+		<!-- Left Bucket -->
+		<div class="col s6" (dragover) = "onDragOver($event)"
+			id="leftBucket">
+			<h1 class="header center orange-text" style="font-size: 3.2rem;">Pending</h1>
+			<ul id='incompleteList'>				
+				<li *ngFor = "let toDo of incomplete">
+					<!-- Todo Item -->
+					<div  class="card yellow darken-1 hoverable scale-transition" draggable="true" 
+						style="cursor:move" (dragstart)="onDrag(toDo)"
+						id="{{toDo._id}}Card">
+						
+						<div class="card-content white-text" id="{{toDo._id}}">
+							<span *ngIf="toDo.editable !== true" class="card-title title specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								[innerHTML]="toDo.title">	
+							</span>
+							<span *ngIf="toDo.editable === true" class="card-title title specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								(drop) = "onDrop($event)" [innerHTML]="toDo.title">	
+							</span>
+							<br>					
+							<div *ngIf="toDo.editable !== true" class="description specialInlineFocus" 
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								(drop) = "onDrop($event)" [innerHTML]="toDo.description">
+							</div>
+							<div *ngIf="toDo.editable === true" class="description specialInlineFocus" 
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								(drop) = "onDrop($event)" [innerHTML]="toDo.description">
+							</div>
+							<br>
+							<div>
+								<div *ngIf="toDo.editable === true" style="float:left">
+									<i class="material-icons" (click)="saveToDo(toDo)" 
+										style="cursor:pointer; color:#eee" title="Save this to-do"
+										onmouseenter="this.style.color='white'"	onmouseleave="this.style.color='#eee'">
+										save
+									</i>
+								</div>
+								<div style="text-align: right;"><i>-&nbsp;{{toDo.author.username}}</i></div>
+							</div>
+						</div>
+						<span *ngIf="toDo.deletable == true" class="deleteTodo" (click)="deleteToDo(toDo)" title="Delete this to-do"></span>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<!-- Right Bucket -->
+		<div class="col s6" (dragover) = "onDragOver($event)"
+			id="rightBucket">
+			<h1 class="header center dark-green-text" style="font-size: 3.2rem;">Complete</h1>
+			<ul id='completeList'>
+				<li *ngFor = "let toDo of complete" >
+					<!-- Todo Item -->
+					<div class="card green darken-1 hoverable scale-transition"
+						draggable="true" (dragstart)="onDrag(toDo)"
+						style="cursor:move" id="{{toDo._id}}Card">
+						
+						<div class="card-content white-text" id="{{toDo._id}}">
+							<span *ngIf="toDo.editable !== true" class="card-title title specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)" 
+								[innerHTML]="toDo.title">
+							</span>
+							<span *ngIf="toDo.editable === true" class="card-title title specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)" 
+								(drop) = "onDrop($event)" [innerHTML]="toDo.title">
+							</span>
+							<br>
+							<div *ngIf="toDo.editable !== true" class="description specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								[innerHTML]="toDo.description">
+							</div>							
+							<div *ngIf="toDo.editable === true" class="description specialInlineFocus"
+								[class.editable]="toDo.editable === true"
+								[style.cursor]="getCursor(toDo)" (dragover) = "onDragOver($event)"
+								(drop) = "onDrop($event)" [innerHTML]="toDo.description">
+							</div>
+							<br>					
+							<div>
+								<div *ngIf="toDo.editable === true" style="float:left" title="Save this to-do">
+									<i class="material-icons" (click)="saveToDo(toDo)" 
+										style="cursor:pointer;color:#d0d0d0" onmouseenter="this.style.color='white'"
+										onmouseleave="this.style.color='#d0d0d0'">
+										save
+									</i>
+								</div>
+								<div style="text-align: right;"><i>-&nbsp;{{toDo.author.username}}</i></div>
+							</div>
+						</div>
+						<span *ngIf="toDo.deletable == true" class="deleteTodo" (click)="deleteToDo(toDo)" title="Delete this to-do"></span>
+					</div>
+				</li>
+			</ul>
+		</div>
+    </div>
+</div>
+<!-- Add button -->
+<div class="fixed-action-btn" id='addButton' style="left: 15px;bottom: 15px; width: 57px;" 
+	(drop) = "onDrop($event)" (dragover) = "onDragOver($event)">
+	<a class="btn-floating btn-large light-blue lighten-1" (click)="addToDo()" >
+		<i class="material-icons">add</i>
+	</a>
+</div>
